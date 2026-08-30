@@ -1136,7 +1136,7 @@ local function lockClientWorld()
         0
     )
 
-    freezeLocalPlayer(true)
+    setElementFrozen(localPlayer, true)
 
     -- Hide HUD and chat
     hideGameHud()
@@ -1144,10 +1144,9 @@ local function lockClientWorld()
     showChat(false)
 
     -- Disable GTA world sounds
-    setWorldSoundEnabled(
-        true,
-        false
-    )
+    setWorldSoundEnabled(5, false)
+    setWorldSoundEnabled(16, false)
+    setWorldSoundEnabled(19, false)
 
     setRadioChannel(0)
 
@@ -1176,17 +1175,16 @@ local function restoreClientWorld()
         false
     )
 
-    freezeLocalPlayer(false)
+    setElementFrozen(localPlayer, false)
 
     setElementAlpha(
         localPlayer,
         255
     )
 
-    setWorldSoundEnabled(
-        true,
-        true
-    )
+    setWorldSoundEnabled(5, true)
+    setWorldSoundEnabled(16, true)
+    setWorldSoundEnabled(19, true)
 
     setPedVoiceEnabled(true)
 
