@@ -1123,12 +1123,40 @@ end
 
 local function lockClientWorld()
 
+    -- Block player controls before login
     toggleAllControls(
         false,
         true,
         false
     )
 
+    -- Hide player during pre-login
+    setElementAlpha(
+        localPlayer,
+        0
+    )
+
+    freezeLocalPlayer(true)
+
+    -- Hide HUD and chat
+    hideGameHud()
+
+    showChat(false)
+
+    -- Disable GTA world sounds
+    setWorldSoundEnabled(
+        true,
+        false
+    )
+
+    setRadioChannel(0)
+
+    setPedVoiceEnabled(false)
+
+    -- Black screen first
+    fadeCamera(false, 0)
+
+    -- Move camera away from the world
     setCameraMatrix(
         PRELOGIN_CAMERA.x,
         PRELOGIN_CAMERA.y,
@@ -1137,10 +1165,6 @@ local function lockClientWorld()
         PRELOGIN_CAMERA.lookY,
         PRELOGIN_CAMERA.lookZ
     )
-
-    hideGameHud()
-
-    showChat(false)
 end
 
 
@@ -1151,6 +1175,20 @@ local function restoreClientWorld()
         true,
         false
     )
+
+    freezeLocalPlayer(false)
+
+    setElementAlpha(
+        localPlayer,
+        255
+    )
+
+    setWorldSoundEnabled(
+        true,
+        true
+    )
+
+    setPedVoiceEnabled(true)
 
     showGameHud()
 
@@ -3452,6 +3490,32 @@ bindKey(
 
             return
         end
+    end
+)
+
+
+-- =========================================================
+-- EARLY PRE LOGIN LOCK
+-- =========================================================
+
+addEventHandler(
+    "onClientResourceStart",
+    root,
+    function()
+
+        if source == resourceRoot then
+
+            if not getElementData(
+                localPlayer,
+                "account:loggedIn"
+            ) then
+
+                lockClientWorld()
+
+            end
+
+        end
+
     end
 )
 
