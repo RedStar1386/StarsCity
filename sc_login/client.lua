@@ -1123,39 +1123,15 @@ end
 
 local function lockClientWorld()
 
-    -- Block player controls before login
     toggleAllControls(
         false,
         true,
         false
     )
 
-    -- Hide player during pre-login
-    setElementAlpha(
-        localPlayer,
-        0
-    )
-
-    setElementFrozen(localPlayer, true)
-
-    -- Hide HUD and chat
-    hideGameHud()
-
-    showChat(false)
-
-    -- Disable GTA world sounds
-    setWorldSoundEnabled(5, false)
-    setWorldSoundEnabled(16, false)
-    setWorldSoundEnabled(19, false)
-
-    setRadioChannel(0)
-
-    setPedVoiceEnabled(false)
-
-    -- Black screen first
+    -- Hide GTA world view before login
     fadeCamera(false, 0)
 
-    -- Move camera away from the world
     setCameraMatrix(
         PRELOGIN_CAMERA.x,
         PRELOGIN_CAMERA.y,
@@ -1164,6 +1140,16 @@ local function lockClientWorld()
         PRELOGIN_CAMERA.lookY,
         PRELOGIN_CAMERA.lookZ
     )
+
+    -- Disable only game world sounds
+    setWorldSoundEnabled(5, false)
+    setWorldSoundEnabled(16, false)
+    setWorldSoundEnabled(19, false)
+
+    hideGameHud()
+
+    -- Keep chat visible as requested
+    showChat(true)
 end
 
 
@@ -1175,18 +1161,9 @@ local function restoreClientWorld()
         false
     )
 
-    setElementFrozen(localPlayer, false)
-
-    setElementAlpha(
-        localPlayer,
-        255
-    )
-
     setWorldSoundEnabled(5, true)
     setWorldSoundEnabled(16, true)
     setWorldSoundEnabled(19, true)
-
-    setPedVoiceEnabled(true)
 
     showGameHud()
 
@@ -3488,32 +3465,6 @@ bindKey(
 
             return
         end
-    end
-)
-
-
--- =========================================================
--- EARLY PRE LOGIN LOCK
--- =========================================================
-
-addEventHandler(
-    "onClientResourceStart",
-    root,
-    function()
-
-        if source == resourceRoot then
-
-            if not getElementData(
-                localPlayer,
-                "account:loggedIn"
-            ) then
-
-                lockClientWorld()
-
-            end
-
-        end
-
     end
 )
 
