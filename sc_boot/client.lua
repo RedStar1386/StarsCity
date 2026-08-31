@@ -8,7 +8,8 @@ addEventHandler(
     "SC_START_CINEMATIC",
     root,
 
-    function()
+    function(plane)
+
 
         outputChatBox(
             "EVENT RECEIVED"
@@ -22,13 +23,15 @@ addEventHandler(
 
 
         setCameraMatrix(
-            0,
-            -20,
+            20,
+            -25,
             310,
             0,
             0,
             300
         )
 
+
     end
+
 )
