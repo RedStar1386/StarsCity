@@ -1362,86 +1362,64 @@ end
 local function drawVehicleTuningMenu(contentX, contentY, leftW, l, mx, my)
     local veh = A.vehicleTuningTarget
     local typ = A.vehicleTuningType or getVehicleTuningType(veh) or "Unknown"
+    local vehicleName = (veh and isElement(veh) and getVehicleNameFromModel(getElementModel(veh))) or "Vehicle"
+    local vehicleID = (veh and isElement(veh) and getElementModel(veh)) or 0
 
-    local panelW = px(430,l)
+    local panelW = math.min(leftW - px(24,l), px(430,l))
+    local panelH = px(430,l)
     local x = contentX + math.max(0,(leftW-panelW)/2)
     local y = contentY + px(10,l)
+    local padding = px(18,l)
+    local gap = px(10,l)
+    local cols = 2
+    local buttonH = px(36,l)
+    local innerW = panelW - padding * 2
+    local buttonW = (innerW - gap) / cols
 
-    dxDrawRectangle(x,y,panelW,px(430,l),COLORS.panel)
+    dxDrawRectangle(x,y,panelW,panelH,COLORS.panel)
 
-    drawText("🔧 Tuning Tools",x,y+px(8,l),panelW,px(24,l),COLORS.text,.9*l.scale,"default-bold","center","center")
+    A.vehicleTuningBackRect = {
+        x = x + padding,
+        y = y + px(10,l),
+        w = px(76,l),
+        h = px(24,l)
+    }
 
-    local model = veh and getElementModel(veh) or 0
-    drawText("Vehicle ID: "..tostring(model).."   Type: "..tostring(typ),
-        x,y+px(34,l),panelW,px(18,l),COLORS.subtext,.55*l.scale,"default","center","center")
+    local backHover = mx and pointInRect(mx,my,A.vehicleTuningBackRect)
+    dxDrawRectangle(A.vehicleTuningBackRect.x, A.vehicleTuningBackRect.y, A.vehicleTuningBackRect.w, A.vehicleTuningBackRect.h, backHover and COLORS.cardHover or COLORS.card)
+    dxDrawRectangle(A.vehicleTuningBackRect.x, A.vehicleTuningBackRect.y, px(4,l), A.vehicleTuningBackRect.h, COLORS.good)
+    drawText("← Back", A.vehicleTuningBackRect.x + px(10,l), A.vehicleTuningBackRect.y, A.vehicleTuningBackRect.w - px(14,l), A.vehicleTuningBackRect.h, COLORS.text, .78*l.scale, "default-bold", "left", "center", true)
+
+    drawText("Tuning Tools",x,y+px(8,l),panelW,px(28,l),COLORS.text,1.02*l.scale,"default-bold","center","center")
+    drawText("Vehicle: "..tostring(vehicleName).."  |  Type: "..tostring(typ).."  |  ID: "..tostring(vehicleID),
+        x + padding, y + px(40,l), panelW - padding*2, px(22,l), COLORS.accent, 0.82*l.scale, "default-bold", "center", "center", true)
 
     A.vehicleTuningRects={}
 
     local opts=TUNING_OPTIONS[typ] or {}
-    local startY=y+px(62,l)
-    local cols=2
-    local bw=px(180,l)
-    local bh=px(32,l)
+    local startY=y+px(72,l)
 
     for i,name in ipairs(opts) do
         local col=(i-1)%cols
         local row=math.floor((i-1)/cols)
 
         local r={
-            x=x+px(25,l)+col*px(190,l),
-            y=startY+row*px(38,l),
-            w=bw,
-            h=bh,
+            x=x + padding + col * (buttonW + gap),
+            y=startY + row * (buttonH + gap),
+            w=buttonW,
+            h=buttonH,
             id=name
         }
 
         local hov=mx and pointInRect(mx,my,r)
 
-        dxDrawRectangle(
-            r.x,r.y,r.w,r.h,
-            hov and COLORS.cardHover or COLORS.card
-        )
+        dxDrawRectangle(r.x, r.y, r.w, r.h, hov and COLORS.cardHover or COLORS.card)
+        dxDrawRectangle(r.x, r.y, px(4,l), r.h, COLORS.good)
 
-        drawText(
-            name,
-            r.x,r.y,r.w,r.h,
-            COLORS.text,
-            .65*l.scale,
-            "default-bold",
-            "center",
-            "center"
-        )
+        drawText(name, r.x + px(12,l), r.y, r.w - px(18,l), r.h, COLORS.text, .78*l.scale, "default-bold", "left", "center", true)
 
         A.vehicleTuningRects[#A.vehicleTuningRects+1]=r
     end
-
-    A.vehicleTuningBackRect={
-        x=x+px(25,l),
-        y=y+px(385,l),
-        w=panelW-px(50,l),
-        h=px(28,l)
-    }
-
-    dxDrawRectangle(
-        A.vehicleTuningBackRect.x,
-        A.vehicleTuningBackRect.y,
-        A.vehicleTuningBackRect.w,
-        A.vehicleTuningBackRect.h,
-        COLORS.card
-    )
-
-    drawText(
-        "← Back",
-        A.vehicleTuningBackRect.x,
-        A.vehicleTuningBackRect.y,
-        A.vehicleTuningBackRect.w,
-        A.vehicleTuningBackRect.h,
-        COLORS.text,
-        .75*l.scale,
-        "default-bold",
-        "center",
-        "center"
-    )
 end
 
 local function executeVehicleAction(action)
