@@ -1,0 +1,36 @@
+<hud>
+    <positions>
+        <small>
+            <ping x="1150" y="5"></ping>
+            <wanted x="1222" y="93"></wanted>
+            <health x="1150" y="67"></health>
+            <armor x="1206" y="67"></armor>
+            <clock x="1206" y="5"></clock>
+            <money x="1262" y="67"></money>
+            <date x="1262" y="5"></date>
+            <player x="1149" y="31"></player>
+        </small>
+        <medium>
+            <ping x="1138" y="4"></ping>
+            <wanted x="1178" y="102"></wanted>
+            <health x="1138" y="72"></health>
+            <armor x="1198" y="72"></armor>
+            <clock x="1197" y="4"></clock>
+            <money x="1258" y="72"></money>
+            <date x="1258" y="4"></date>
+            <player x="1138" y="33"></player>
+        </medium>
+        <large>
+            <ping x="1132" y="3"></ping>
+            <wanted x="1173" y="109"></wanted>
+            <health x="1132" y="77"></health>
+            <armor x="1194" y="77"></armor>
+            <clock x="1194" y="3"></clock>
+            <money x="1257" y="77"></money>
+            <date x="1257" y="3"></date>
+            <player x="1133" y="35"></player>
+        </large>
+    </positions>
+    <visible ping="true" player="true" health="true" wanted="true" clock="true" date="true" money="true" armor="true"></visible>
+    <theme iconColor="red" textSize="medium" currentFont="font3" opacity="100" radius="12"></theme>
+</hud>
