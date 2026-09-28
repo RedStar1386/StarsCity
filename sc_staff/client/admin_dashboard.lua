@@ -371,6 +371,16 @@ local function getCatalogData(catalogType)
     return data
 end
 
+local function getActiveVehicleModelSet()
+    local active = {}
+    local state = (A.snapshot and type(A.snapshot.adminState) == "table") and A.snapshot.adminState or {}
+    for _, model in ipairs(type(state.spawnedVehicleModels) == "table" and state.spawnedVehicleModels or {}) do
+        model = tonumber(model)
+        if model then active[model] = true end
+    end
+    return active
+end
+
 function D.filterCatalog()
     local sourceData = getCatalogData(D.catalogType)
     local needle = ""
@@ -386,7 +396,16 @@ function D.filterCatalog()
         end
     end
 
+    local activeVehicleModels = D.catalogType == "vehicles" and getActiveVehicleModelSet() or nil
     table.sort(rows, function(a, b)
+        if activeVehicleModels then
+            local aActive = activeVehicleModels[tonumber(a.id)] == true
+            local bActive = activeVehicleModels[tonumber(b.id)] == true
+            if aActive ~= bActive then
+                return aActive
+            end
+        end
+
         if D.catalogSort == "name_desc" then
             local an, bn = string.lower(a.name), string.lower(b.name)
             if an ~= bn then return an > bn end
@@ -697,16 +716,10 @@ local function drawCatalog(x, y, w, h, l, mx, my)
         local rowEnabled = true
         local destroyVehicle = false
         if isVehicle then
-            local state = (A.snapshot and type(A.snapshot.adminState) == "table") and A.snapshot.adminState or {}
-            local activeModel = tonumber(state.spawnedVehicleModel)
-            if activeModel then
-                if activeModel == tonumber(row.id) then
-                    rowActionLabel = "Destroy"
-                    destroyVehicle = true
-                else
-                    rowActionLabel = "Active"
-                    rowEnabled = false
-                end
+            local activeModels = getActiveVehicleModelSet()
+            if activeModels[tonumber(row.id)] then
+                rowActionLabel = "Destroy"
+                destroyVehicle = true
             end
         end
         local br = { x = cellX + px(9,l), y = rowY + px(5,l), w = bw, h = bh, id = "catalog_action", item = row, enabled = rowEnabled, destroyVehicle = destroyVehicle }
@@ -955,7 +968,7 @@ function D.handleClick(x, y)
                 sendDashboardAction("dashboard.set_skin", { value = tostring(item.id) })
             elseif D.mode == "vehicles" then
                 if rect.destroyVehicle then
-                    sendDashboardAction("dashboard.destroy_vehicle", {})
+                    sendDashboardAction("dashboard.destroy_vehicle", { value = tostring(item.id) })
                 else
                     sendDashboardAction("dashboard.spawn_vehicle", { value = tostring(item.id) })
                 end
@@ -1230,7 +1243,22 @@ function D.onSnapshot(snapshot)
         D.flightActive = false
         setDashboardControl("jump", true)
     end
+    if D.catalogType == "vehicles" then
+        D.filterCatalog()
+    end
 end
+
+addEvent("scAdminDashboardVehicleState", true)
+addEventHandler("scAdminDashboardVehicleState", resourceRoot, function(models)
+    if A and A.snapshot then
+        A.snapshot.adminState = type(A.snapshot.adminState) == "table" and A.snapshot.adminState or {}
+        A.snapshot.adminState.spawnedVehicleModels = type(models) == "table" and models or {}
+    end
+    if D.catalogType == "vehicles" then
+        D.catalogScroll = 0
+        D.filterCatalog()
+    end
+end)
 
 
 addEventHandler("onClientResourceStop", resourceRoot, function()
